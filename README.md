@@ -1,0 +1,1 @@
+A personal learning project for working through Crafting Interpreters by Robert Nystrom, with the goal of understanding language design and implementation from the ground up. The first part of the book (the tree-walking interpreter) is implemented in Python and the second part in Rust.
