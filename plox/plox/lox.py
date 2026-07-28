@@ -37,5 +37,5 @@ class Lox:
         self.report(line, "", message)
 
     def report(self, line: int, where: str, message: str) -> None:
-        print(f'[line {line}] Error{where}: {message}', file=sys.stderr)
+        print(f"[line {line}] Error{where}: {message}", file=sys.stderr)
         self.had_error = True

@@ -22,8 +22,10 @@ class TestSingleCharTokens:
     def test_parens_and_braces(self):
         tokens, lox = scan("(){}")
         assert token_types(tokens) == [
-            tt.LEFT_PAREN, tt.RIGHT_PAREN,
-            tt.LEFT_BRACE, tt.RIGHT_BRACE,
+            tt.LEFT_PAREN,
+            tt.RIGHT_PAREN,
+            tt.LEFT_BRACE,
+            tt.RIGHT_BRACE,
             tt.EOF,
         ]
         assert not lox.had_error
@@ -31,22 +33,30 @@ class TestSingleCharTokens:
     def test_punctuation(self):
         tokens, _ = scan(",.-+;*")
         assert token_types(tokens) == [
-            tt.COMMA, tt.DOT, tt.MINUS, tt.PLUS, tt.SEMICOLON, tt.STAR,
+            tt.COMMA,
+            tt.DOT,
+            tt.MINUS,
+            tt.PLUS,
+            tt.SEMICOLON,
+            tt.STAR,
             tt.EOF,
         ]
 
 
 class TestOneOrTwoCharTokens:
-    @pytest.mark.parametrize("source,expected", [
-        ("!", tt.BANG),
-        ("!=", tt.BANG_EQUAL),
-        ("=", tt.EQUAL),
-        ("==", tt.EQUAL_EQUAL),
-        ("<", tt.LESS),
-        ("<=", tt.LESS_EQUAL),
-        (">", tt.GREATER),
-        (">=", tt.GREATER_EQUAL),
-    ])
+    @pytest.mark.parametrize(
+        "source,expected",
+        [
+            ("!", tt.BANG),
+            ("!=", tt.BANG_EQUAL),
+            ("=", tt.EQUAL),
+            ("==", tt.EQUAL_EQUAL),
+            ("<", tt.LESS),
+            ("<=", tt.LESS_EQUAL),
+            (">", tt.GREATER),
+            (">=", tt.GREATER_EQUAL),
+        ],
+    )
     def test_operator(self, source, expected):
         tokens, _ = scan(source)
         assert token_types(tokens) == [expected, tt.EOF]
@@ -81,12 +91,12 @@ class TestCStyleBlockComments:
         assert token_types(tokens) == [tt.EOF]
 
     def test_unterminated_block_comment_reports_error(self):
-        _,  lox = scan("/* Comment\n")
+        _, lox = scan("/* Comment\n")
         assert lox.had_error
 
     def test_block_comment_does_not_consume_following_token(self):
         tokens, _ = scan("/* comment */+")
-        assert token_types(tokens) == [tt.PLUS, tt.EOF] 
+        assert token_types(tokens) == [tt.PLUS, tt.EOF]
 
     def test_line_number_advances_past_multipleline_comment(self):
         tokens, _ = scan("/*line1\nline2\nline3*/+")
@@ -95,19 +105,20 @@ class TestCStyleBlockComments:
 
     def test_block_comment_containing_asterisk(self):
         tokens, _ = scan("/* 2 * 3 = 6 */+")
-        assert token_types(tokens) == [tt.PLUS, tt.EOF]   
+        assert token_types(tokens) == [tt.PLUS, tt.EOF]
 
     def test_block_comment_containing_slash(self):
         tokens, _ = scan("/* a / b */+")
         assert token_types(tokens) == [tt.PLUS, tt.EOF]
-    
+
     def test_empty_block_comment(self):
         tokens, _ = scan("/**/")
         assert token_types(tokens) == [tt.EOF]
-    
+
     def test_slash_star_slash_is_empty_comment_not_unterminated(self):
         _, lox = scan("/*/")
         assert lox.had_error
+
 
 class TestWhitespaceAndLines:
     def test_whitespace_ignored(self):
@@ -173,14 +184,27 @@ class TestIdentifiersAndKeywords:
         tokens, _ = scan("_my_var2")
         assert token_types(tokens) == [tt.IDENTIFIER, tt.EOF]
 
-    @pytest.mark.parametrize("keyword,expected", [
-        ("and", tt.AND), ("class", tt.CLASS), ("else", tt.ELSE),
-        ("false", tt.FALSE), ("for", tt.FOR), ("fun", tt.FUN),
-        ("if", tt.IF), ("nil", tt.NIL), ("or", tt.OR),
-        ("print", tt.PRINT), ("return", tt.RETURN), ("super", tt.SUPER),
-        ("this", tt.THIS), ("true", tt.TRUE), ("var", tt.VAR),
-        ("while", tt.WHILE),
-    ])
+    @pytest.mark.parametrize(
+        "keyword,expected",
+        [
+            ("and", tt.AND),
+            ("class", tt.CLASS),
+            ("else", tt.ELSE),
+            ("false", tt.FALSE),
+            ("for", tt.FOR),
+            ("fun", tt.FUN),
+            ("if", tt.IF),
+            ("nil", tt.NIL),
+            ("or", tt.OR),
+            ("print", tt.PRINT),
+            ("return", tt.RETURN),
+            ("super", tt.SUPER),
+            ("this", tt.THIS),
+            ("true", tt.TRUE),
+            ("var", tt.VAR),
+            ("while", tt.WHILE),
+        ],
+    )
     def test_keyword(self, keyword, expected):
         tokens, _ = scan(keyword)
         assert token_types(tokens) == [expected, tt.EOF]
@@ -196,7 +220,11 @@ class TestFullStatement:
     def test_var_declaration(self):
         tokens, lox = scan("var language = 'lox';".replace("'", '"'))
         assert token_types(tokens) == [
-            tt.VAR, tt.IDENTIFIER, tt.EQUAL, tt.STRING, tt.SEMICOLON,
+            tt.VAR,
+            tt.IDENTIFIER,
+            tt.EQUAL,
+            tt.STRING,
+            tt.SEMICOLON,
             tt.EOF,
         ]
         assert tokens[1].lexeme == "language"

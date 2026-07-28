@@ -1,7 +1,6 @@
 import sys
 from plox.lox import Lox
 
-
 if __name__ == "__main__":
     lox = Lox()
     if len(sys.argv) > 2:
