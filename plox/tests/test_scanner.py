@@ -71,6 +71,44 @@ class TestComments:
         assert token_types(tokens) == [tt.SLASH, tt.EOF]
 
 
+class TestCStyleBlockComments:
+    def test_single_line_block_comment_is_ignored(self):
+        tokens, _ = scan("/* This is a comment. */")
+        assert token_types(tokens) == [tt.EOF]
+
+    def test_block_comment_consume_multiple_lines(self):
+        tokens, _ = scan("/*comment1\ncomment2\ncomment3*/")
+        assert token_types(tokens) == [tt.EOF]
+
+    def test_unterminated_block_comment_reports_error(self):
+        _,  lox = scan("/* Comment\n")
+        assert lox.had_error
+
+    def test_block_comment_does_not_consume_following_token(self):
+        tokens, _ = scan("/* comment */+")
+        assert token_types(tokens) == [tt.PLUS, tt.EOF] 
+
+    def test_line_number_advances_past_multipleline_comment(self):
+        tokens, _ = scan("/*line1\nline2\nline3*/+")
+        plus_token = [t for t in tokens if t.type == tt.PLUS][0]
+        assert plus_token.line == 3
+
+    def test_block_comment_containing_asterisk(self):
+        tokens, _ = scan("/* 2 * 3 = 6 */+")
+        assert token_types(tokens) == [tt.PLUS, tt.EOF]   
+
+    def test_block_comment_containing_slash(self):
+        tokens, _ = scan("/* a / b */+")
+        assert token_types(tokens) == [tt.PLUS, tt.EOF]
+    
+    def test_empty_block_comment(self):
+        tokens, _ = scan("/**/")
+        assert token_types(tokens) == [tt.EOF]
+    
+    def test_slash_star_slash_is_empty_comment_not_unterminated(self):
+        _, lox = scan("/*/")
+        assert lox.had_error
+
 class TestWhitespaceAndLines:
     def test_whitespace_ignored(self):
         tokens, _ = scan(" \t\r+")
