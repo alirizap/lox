@@ -74,6 +74,18 @@ class Scanner:
                 # A comment goes until the end of the line.
                 while self.peek() != '\n' and not self.is_at_end():
                     self.advance()
+            case '/' if self.match('*'):
+                # C-style /* ... */ block comments.
+                while not (self.peek() == '*' and self.peek_next() == '/') and not self.is_at_end():
+                    if self.peek() == '\n':
+                        self.line += 1
+                    self.advance()
+                if self.is_at_end():
+                    self.lox.error(self.line, "Unterminated block comment.") 
+                    return
+                
+                self.advance()
+                self.advance()
             case '/':
                 self.add_token(tt.SLASH)
             case ' ' | '\r' | '\t':
