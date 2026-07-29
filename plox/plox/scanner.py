@@ -4,25 +4,6 @@ from plox.token_type import TokenType as tt
 
 
 class Scanner:
-    keywords = {
-        "and": tt.AND,
-        "class": tt.CLASS,
-        "else": tt.ELSE,
-        "false": tt.FALSE,
-        "for": tt.FOR,
-        "fun": tt.FUN,
-        "if": tt.IF,
-        "nil": tt.NIL,
-        "or": tt.OR,
-        "print": tt.PRINT,
-        "return": tt.RETURN,
-        "super": tt.SUPER,
-        "this": tt.THIS,
-        "true": tt.TRUE,
-        "var": tt.VAR,
-        "while": tt.WHILE,
-    }
-
     def __init__(self, source: str, lox) -> None:
         self.source = source
         self.tokens = []
@@ -30,6 +11,24 @@ class Scanner:
         self.current = 0
         self.line = 1
         self.lox = lox
+        self.keywords = {
+            "and": tt.AND,
+            "class": tt.CLASS,
+            "else": tt.ELSE,
+            "false": tt.FALSE,
+            "for": tt.FOR,
+            "fun": tt.FUN,
+            "if": tt.IF,
+            "nil": tt.NIL,
+            "or": tt.OR,
+            "print": tt.PRINT,
+            "return": tt.RETURN,
+            "super": tt.SUPER,
+            "this": tt.THIS,
+            "true": tt.TRUE,
+            "var": tt.VAR,
+            "while": tt.WHILE,
+        }
 
     def scan_tokens(self) -> list[Token]:
         while not self.is_at_end():
