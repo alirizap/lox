@@ -22,3 +22,12 @@ class Interpreter(ExprVisitor):
                 return not self.is_truthy(right)
             case tt.MINUS:
                 return -float(right)
+
+    def is_truthy(self, object: Any) -> bool:
+        match object:
+            case None:
+                return False
+            case bool():
+                return object
+            case _:
+                return True
