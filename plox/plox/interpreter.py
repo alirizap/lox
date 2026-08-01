@@ -2,6 +2,7 @@ from typing import Any
 from plox.expr import Expr, ExprVisitor, Binary, Grouping, Unary, Literal
 from plox.token import Token
 from plox.token_type import TokenType as tt
+from plox.errors import LoxRuntimeError
 
 
 class Interpreter(ExprVisitor):
@@ -14,22 +15,29 @@ class Interpreter(ExprVisitor):
 
         match expr.operator.type:
             case tt.GREATER:
+                self.check_number_operands(expr.operator, left, right)
                 return left > right
             case tt.GREATER_EQUAL:
+                self.check_number_operands(expr.operator, left, right)
                 return left >= right
             case tt.LESS:
+                self.check_number_operands(expr.operator, left, right)
                 return left < right
             case tt.LESS_EQUAL:
+                self.check_number_operands(expr.operator, left, right)
                 return left <= right
             case tt.BANG_EQUAL:
                 return not self.is_equal(left, right)
             case tt.EQUAL_EQUAL:
                 return self.is_equal(left, right)
             case tt.MINUS:
+                self.check_number_operands(expr.operator, left, right)
                 return left - right
             case tt.SLASH:
+                self.check_number_operands(expr.operator, left, right)
                 return left / right
             case tt.STAR:
+                self.check_number_operands(expr.operator, left, right)
                 return left * right
             case tt.PLUS:
                 match (right, left):
@@ -37,6 +45,10 @@ class Interpreter(ExprVisitor):
                         return left + right
                     case (str(), str()):
                         return left + right
+                    case _:
+                        raise LoxRuntimeError(
+                            expr.operator, "Operands must be two numbers or two strings"
+                        )
 
     def visit_grouping_expr(self, expr: Grouping) -> Any:
         return self.evaluate(expr.expression)
@@ -51,7 +63,22 @@ class Interpreter(ExprVisitor):
             case tt.BANG:
                 return not self.is_truthy(right)
             case tt.MINUS:
+                self.check_number_operand(expr.operator, right)
                 return -float(right)
+
+    def check_number_operand(self, operator: Token, operand: Any) -> None:
+        match operand:
+            case float():
+                return
+            case _:
+                raise LoxRuntimeError(operator, "Operand must be a number.")
+
+    def check_number_operands(self, operator: Token, left: Any, right: Any) -> None:
+        match (left, right):
+            case (float(), float()):
+                return
+            case _:
+                raise LoxRuntimeError(operator, "Operands must be a number.")
 
     def is_truthy(self, object: Any) -> bool:
         match object:
