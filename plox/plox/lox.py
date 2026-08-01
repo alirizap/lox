@@ -1,6 +1,7 @@
 import sys
 from pathlib import Path
-from plox.ast_printer import ASTPrinter
+from plox.errors import LoxRuntimeError
+from plox.interpreter import Interpreter
 from plox.parser import Parser
 from plox.scanner import Scanner
 from plox.token import Token
@@ -9,7 +10,9 @@ from plox.token_type import TokenType
 
 class Lox:
     def __init__(self) -> None:
+        self.interpreter = Interpreter(self)
         self.had_error = False
+        self.had_runtime_error = False
 
     def run_file(self, path: str) -> None:
         source = Path(path).read_text(encoding="utf-8")
@@ -17,6 +20,8 @@ class Lox:
 
         if self.had_error:
             sys.exit(65)
+        if self.had_runtime_error:
+            sys.exit(70)
 
     def run_prompt(self) -> None:
         while True:
@@ -38,7 +43,7 @@ class Lox:
         if self.had_error or expression is None:
             return
 
-        print(ASTPrinter().print(expression))
+        self.interpreter.interpret(expression)
 
     def error(self, line: int, message: str) -> None:
         self.report(line, "", message)
@@ -48,6 +53,10 @@ class Lox:
             self.report(token.line, " at end", message)
         else:
             self.report(token.line, f" at '{token.lexeme}'", message)
+
+    def runtime_error(self, error: LoxRuntimeError) -> None:
+        print(f"{error.message}\n[line {error.token.line}]", file=sys.stderr)
+        self.had_runtime_error = True
 
     def report(self, line: int, where: str, message: str) -> None:
         print(f"[line {line}] Error{where}: {message}", file=sys.stderr)

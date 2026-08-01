@@ -6,6 +6,16 @@ from plox.errors import LoxRuntimeError
 
 
 class Interpreter(ExprVisitor):
+    def __init__(self, lox) -> None:
+        self.lox = lox
+
+    def interpret(self, expression: Expr) -> None:
+        try:
+            value = self.evaluate(expression)
+            print(self.stringify(value))
+        except LoxRuntimeError as error:
+            self.lox.runtime_error(error)
+
     def evaluate(self, expr: Expr) -> Any:
         expr.accept(self)
 
@@ -95,3 +105,15 @@ class Interpreter(ExprVisitor):
         if a is None:
             return False
         return a == b
+
+    def stringify(self, object: Any) -> str:
+        match object:
+            case None:
+                return "nil"
+            case float():
+                text = str(object)
+                if text.endswith(".0"):
+                    text = text[: len(text) - 2]
+                return text
+            case _:
+                return str(object)
