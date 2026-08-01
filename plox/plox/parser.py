@@ -1,10 +1,7 @@
 from plox.expr import Expr, Binary, Grouping, Literal, Unary
 from plox.token import Token
 from plox.token_type import TokenType as tt
-
-
-class ParseError(RuntimeError):
-    pass
+from plox.errors import ParseError
 
 
 class Parser:
