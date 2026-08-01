@@ -17,7 +17,7 @@ class Interpreter(ExprVisitor):
             self.lox.runtime_error(error)
 
     def evaluate(self, expr: Expr) -> Any:
-        expr.accept(self)
+        return expr.accept(self)
 
     def visit_binary_expr(self, expr: Binary) -> Any:
         left = self.evaluate(expr.left)
