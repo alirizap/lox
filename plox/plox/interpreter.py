@@ -45,6 +45,8 @@ class Interpreter(ExprVisitor):
                 return left - right
             case tt.SLASH:
                 self.check_number_operands(expr.operator, left, right)
+                if right == 0:
+                    raise LoxRuntimeError(expr.operator, "Division by zero.")
                 return left / right
             case tt.STAR:
                 self.check_number_operands(expr.operator, left, right)
