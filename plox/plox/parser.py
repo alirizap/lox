@@ -1,4 +1,5 @@
 from plox.expr import Expr, Binary, Grouping, Literal, Unary
+from plox.stmt import Stmt, Print, Expression
 from plox.token import Token
 from plox.token_type import TokenType as tt
 from plox.errors import ParseError
@@ -10,14 +11,31 @@ class Parser:
         self.current = 0
         self.lox = lox
 
-    def parse(self) -> Expr | None:
-        try:
-            return self.expression()
-        except ParseError:
-            return None
+    def parse(self) -> list[Stmt]:
+        statements = []
+        while not self.is_at_end():
+            statements.append(self.statement())
+
+        return statements
 
     def expression(self) -> Expr:
         return self.equality()
+
+    def statement(self) -> Stmt:
+        if self.match(tt.PRINT):
+            return self.print_statement()
+
+        return self.expression_statement()
+
+    def print_statement(self) -> Stmt:
+        value = self.expression()
+        self.consume(tt.SEMICOLON, "Expect ';' after value.")
+        return Print(value)
+
+    def expression_statement(self) -> Stmt:
+        expr = self.expression()
+        self.consume(tt.SEMICOLON, "Expect ';' after expression.")
+        return Expression(expr)
 
     def equality(self) -> Expr:
         expr = self.comparison()
