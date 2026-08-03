@@ -2,7 +2,6 @@
 Expr AST node definations.
 GENERATED CODE - produced by tool/generate_ast.py. do not edit by hand.
 """
-
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -67,3 +66,4 @@ class Unary(Expr):
 
     def accept(self, visitor: ExprVisitor) -> Any:
         return visitor.visit_unary_expr(self)
+

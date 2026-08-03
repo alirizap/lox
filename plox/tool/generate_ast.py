@@ -81,6 +81,15 @@ def main() -> None:
         ],
     )
 
+    define_ast(
+        output_dir,
+        "Stmt",
+        [
+            "Expression : Expr expression",
+            "Print      : Expr expression",
+        ],
+    )
+
 
 if __name__ == "__main__":
     main()
