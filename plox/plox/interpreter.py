@@ -1,23 +1,34 @@
 from typing import Any
 from plox.expr import Expr, ExprVisitor, Binary, Grouping, Unary, Literal
+from plox.stmt import Stmt, StmtVisitor, Print, Expression
 from plox.token import Token
 from plox.token_type import TokenType as tt
 from plox.errors import LoxRuntimeError
 
 
-class Interpreter(ExprVisitor):
+class Interpreter(ExprVisitor, StmtVisitor):
     def __init__(self, lox) -> None:
         self.lox = lox
 
-    def interpret(self, expression: Expr) -> None:
+    def interpret(self, statements: list[Stmt]) -> None:
         try:
-            value = self.evaluate(expression)
-            print(self.stringify(value))
+            for statement in statements:
+                self.execute(statement)
         except LoxRuntimeError as error:
             self.lox.runtime_error(error)
 
     def evaluate(self, expr: Expr) -> Any:
         return expr.accept(self)
+
+    def execute(self, stmt: Stmt) -> None:
+        stmt.accept(self)
+
+    def visit_expression_stmt(self, stmt: Expression) -> None:
+        self.evaluate(stmt.expression)
+
+    def visit_print_stmt(self, stmt: Print) -> None:
+        value = self.evaluate(stmt.expression)
+        print(self.stringify(value))
 
     def visit_binary_expr(self, expr: Binary) -> Any:
         left = self.evaluate(expr.left)

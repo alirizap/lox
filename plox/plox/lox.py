@@ -38,12 +38,12 @@ class Lox:
         scanner = Scanner(source, self)
         tokens = scanner.scan_tokens()
         parser = Parser(tokens, self)
-        expression = parser.parse()
+        statements = parser.parse()
 
-        if self.had_error or expression is None:
+        if self.had_error:
             return
 
-        self.interpreter.interpret(expression)
+        self.interpreter.interpret(statements)
 
     def error(self, line: int, message: str) -> None:
         self.report(line, "", message)
