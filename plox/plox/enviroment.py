@@ -3,7 +3,7 @@ from plox.token import Token
 from plox.errors import LoxRuntimeError
 
 
-class Enviroment:
+class Environment:
     def __init__(self) -> None:
         self.values = dict()
 
