@@ -1,4 +1,4 @@
-from plox.expr import Expr, Binary, Grouping, Literal, Unary, Variable
+from plox.expr import Expr, Assign, Binary, Grouping, Literal, Unary, Variable
 from plox.stmt import Stmt, Print, Var, Expression
 from plox.token import Token
 from plox.token_type import TokenType as tt
@@ -19,7 +19,7 @@ class Parser:
         return statements
 
     def expression(self) -> Expr:
-        return self.equality()
+        return self.assignment()
 
     def declaration(self) -> Stmt | None:
         try:
@@ -55,6 +55,21 @@ class Parser:
         expr = self.expression()
         self.consume(tt.SEMICOLON, "Expect ';' after expression.")
         return Expression(expr)
+
+    def assignment(self) -> Expr:
+        expr = self.equality()
+
+        if self.match(tt.EQUAL):
+            equals = self.previous()
+            value = self.assignment()
+
+            if isinstance(expr, Variable):
+                name = expr.name
+                return Assign(name, value)
+
+            self.error(equals, "invalid assignment target.")
+
+        return expr
 
     def equality(self) -> Expr:
         expr = self.comparison()
