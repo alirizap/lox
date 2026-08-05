@@ -32,6 +32,10 @@ class ExprVisitor(ABC):
     def visit_unary_expr(self, expr: Unary) -> Any:
         raise NotImplementedError
 
+    @abstractmethod
+    def visit_variable_expr(self, expr: Variable) -> Any:
+        raise NotImplementedError
+
 
 @dataclass(frozen=True)
 class Binary(Expr):
@@ -66,4 +70,12 @@ class Unary(Expr):
 
     def accept(self, visitor: ExprVisitor) -> Any:
         return visitor.visit_unary_expr(self)
+
+
+@dataclass(frozen=True)
+class Variable(Expr):
+    name: Token
+
+    def accept(self, visitor: ExprVisitor) -> Any:
+        return visitor.visit_variable_expr(self)
 

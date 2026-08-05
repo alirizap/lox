@@ -2,12 +2,11 @@
 Stmt AST node definations.
 GENERATED CODE - produced by tool/generate_ast.py. do not edit by hand.
 """
-
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any
-from plox.expr import Expr
+from plox.token import Token
 
 
 class Stmt(ABC):
@@ -25,6 +24,10 @@ class StmtVisitor(ABC):
     def visit_print_stmt(self, stmt: Print) -> Any:
         raise NotImplementedError
 
+    @abstractmethod
+    def visit_var_stmt(self, stmt: Var) -> Any:
+        raise NotImplementedError
+
 
 @dataclass(frozen=True)
 class Expression(Stmt):
@@ -40,3 +43,13 @@ class Print(Stmt):
 
     def accept(self, visitor: StmtVisitor) -> Any:
         return visitor.visit_print_stmt(self)
+
+
+@dataclass(frozen=True)
+class Var(Stmt):
+    name: Token
+    initializer: Expr
+
+    def accept(self, visitor: StmtVisitor) -> Any:
+        return visitor.visit_var_stmt(self)
+

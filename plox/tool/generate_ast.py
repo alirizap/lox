@@ -78,6 +78,7 @@ def main() -> None:
             "Grouping : Expr expression",
             "Literal  : Any value",
             "Unary    : Token operator, Expr right",
+            "Variable : Token name",
         ],
     )
 
@@ -87,6 +88,7 @@ def main() -> None:
         [
             "Expression : Expr expression",
             "Print      : Expr expression",
+            "Var        : Token name, Expr initializer",
         ],
     )
 
