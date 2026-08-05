@@ -24,7 +24,7 @@ class Parser:
     def declaration(self) -> Stmt | None:
         try:
             if self.match(tt.VAR):
-                return self.var_declartation()
+                return self.var_declaration()
             return self.statement()
         except ParseError:
             self.synchronize()

@@ -1,14 +1,16 @@
 from typing import Any
-from plox.expr import Expr, ExprVisitor, Binary, Grouping, Unary, Literal
-from plox.stmt import Stmt, StmtVisitor, Print, Expression
+from plox.expr import Expr, ExprVisitor, Binary, Grouping, Unary, Literal, Variable
+from plox.stmt import Stmt, StmtVisitor, Print, Expression, Var
 from plox.token import Token
 from plox.token_type import TokenType as tt
+from plox.environment import Environment
 from plox.errors import LoxRuntimeError
 
 
 class Interpreter(ExprVisitor, StmtVisitor):
     def __init__(self, lox) -> None:
         self.lox = lox
+        self.environment = Environment()
 
     def interpret(self, statements: list[Stmt]) -> None:
         try:
@@ -29,6 +31,13 @@ class Interpreter(ExprVisitor, StmtVisitor):
     def visit_print_stmt(self, stmt: Print) -> None:
         value = self.evaluate(stmt.expression)
         print(self.stringify(value))
+
+    def visit_var_stmt(self, stmt: Var) -> None:
+        value = None
+        if stmt.initializer is not None:
+            value = self.evaluate(stmt.initializer)
+
+        self.environment.define(stmt.name.lexeme, value)
 
     def visit_binary_expr(self, expr: Binary) -> Any:
         left = self.evaluate(expr.left)
@@ -88,6 +97,9 @@ class Interpreter(ExprVisitor, StmtVisitor):
             case tt.MINUS:
                 self.check_number_operand(expr.operator, right)
                 return -float(right)
+
+    def visit_variable_expr(self, expr: Variable) -> Any:
+        return self.environment.get(expr.name)
 
     def check_number_operand(self, operator: Token, operand: Any) -> None:
         match operand:
