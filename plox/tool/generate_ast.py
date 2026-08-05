@@ -74,6 +74,7 @@ def main() -> None:
         output_dir,
         "Expr",
         [
+            "Assign   : name Token, value Expr",
             "Binary   : Expr left, Token operator, Expr right",
             "Grouping : Expr expression",
             "Literal  : Any value",
