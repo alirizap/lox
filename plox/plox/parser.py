@@ -1,5 +1,5 @@
-from plox.expr import Expr, Binary, Grouping, Literal, Unary
-from plox.stmt import Stmt, Print, Expression
+from plox.expr import Expr, Binary, Grouping, Literal, Unary, Variable
+from plox.stmt import Stmt, Print, Var, Expression
 from plox.token import Token
 from plox.token_type import TokenType as tt
 from plox.errors import ParseError
@@ -14,12 +14,21 @@ class Parser:
     def parse(self) -> list[Stmt]:
         statements = []
         while not self.is_at_end():
-            statements.append(self.statement())
+            statements.append(self.declaration())
 
         return statements
 
     def expression(self) -> Expr:
         return self.equality()
+
+    def declaration(self) -> Stmt | None:
+        try:
+            if self.match(tt.VAR):
+                return self.var_declartation()
+            return self.statement()
+        except ParseError:
+            self.synchronize()
+            return None
 
     def statement(self) -> Stmt:
         if self.match(tt.PRINT):
@@ -31,6 +40,16 @@ class Parser:
         value = self.expression()
         self.consume(tt.SEMICOLON, "Expect ';' after value.")
         return Print(value)
+
+    def var_declaration(self) -> Stmt | None:
+        name = self.consume(tt.IDENTIFIER, "Expect variable name.")
+
+        initializer = None
+        if self.match(tt.EQUAL):
+            initializer = self.expression()
+
+        self.consume(tt.SEMICOLON, "Expect ';' after variable declaration.")
+        return Var(name, initializer)
 
     def expression_statement(self) -> Stmt:
         expr = self.expression()
@@ -94,6 +113,8 @@ class Parser:
             return Literal(None)
         if self.match(tt.NUMBER, tt.STRING):
             return Literal(self.previous().literal)
+        if self.match(tt.IDENTIFIER):
+            return Variable(self.previous())
         if self.match(tt.LEFT_PAREN):
             expr = self.expression()
             self.consume(tt.RIGHT_PAREN, "Expect ')' after expression.")
