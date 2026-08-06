@@ -2,6 +2,7 @@
 Expr AST node definations.
 GENERATED CODE - produced by tool/generate_ast.py. do not edit by hand.
 """
+
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -43,8 +44,8 @@ class ExprVisitor(ABC):
 
 @dataclass(frozen=True)
 class Assign(Expr):
-    Token: name
-    Expr: value
+    name: Token
+    value: Expr
 
     def accept(self, visitor: ExprVisitor) -> Any:
         return visitor.visit_assign_expr(self)
@@ -91,4 +92,3 @@ class Variable(Expr):
 
     def accept(self, visitor: ExprVisitor) -> Any:
         return visitor.visit_variable_expr(self)
-
