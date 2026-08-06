@@ -1,5 +1,14 @@
 from typing import Any
-from plox.expr import Expr, ExprVisitor, Binary, Grouping, Unary, Literal, Variable
+from plox.expr import (
+    Expr,
+    ExprVisitor,
+    Assign,
+    Binary,
+    Grouping,
+    Unary,
+    Literal,
+    Variable,
+)
 from plox.stmt import Stmt, StmtVisitor, Print, Expression, Var
 from plox.token import Token
 from plox.token_type import TokenType as tt
@@ -38,6 +47,11 @@ class Interpreter(ExprVisitor, StmtVisitor):
             value = self.evaluate(stmt.initializer)
 
         self.environment.define(stmt.name.lexeme, value)
+
+    def visit_assign_expr(self, expr: Assign) -> Any:
+        value = self.evaluate(expr)
+        self.environment.assign(expr.name, value)
+        return value
 
     def visit_binary_expr(self, expr: Binary) -> Any:
         left = self.evaluate(expr.left)
