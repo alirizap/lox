@@ -49,7 +49,7 @@ class Interpreter(ExprVisitor, StmtVisitor):
         self.environment.define(stmt.name.lexeme, value)
 
     def visit_assign_expr(self, expr: Assign) -> Any:
-        value = self.evaluate(expr)
+        value = self.evaluate(expr.value)
         self.environment.assign(expr.name, value)
         return value
 
